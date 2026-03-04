@@ -42,7 +42,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     dashboard: ["view"],
     transactions: ["view", "create", "update", "act_on_behalf"],
     customers: ["view", "create", "update"],
-    rates: ["view"],
+    rates: ["view", "create", "update"],
     virtual_accounts: ["view", "create", "update"],
     approvals: ["view", "approve"],
     audit_logs: ["view"],
