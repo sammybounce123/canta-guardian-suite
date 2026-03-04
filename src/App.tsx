@@ -21,6 +21,7 @@ import CustomerDetail from "./pages/CustomerDetail";
 import CustomerOnboarding from "./pages/CustomerOnboarding";
 import FinancialMetrics from "./pages/FinancialMetrics";
 import Reports from "./pages/Reports";
+import Expenses from "./pages/Expenses";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/audit-logs" element={<AppLayout><AuditLogs /></AppLayout>} />
             <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
             <Route path="/financial-metrics" element={<AppLayout><FinancialMetrics /></AppLayout>} />
+            <Route path="/expenses" element={<AppLayout><Expenses /></AppLayout>} />
             <Route path="/reports" element={<AppLayout><Reports /></AppLayout>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -25,7 +25,8 @@ type Resource =
   | "kyc"
   | "financial_metrics"
   | "notifications"
-  | "reporting";
+  | "reporting"
+  | "expenses";
 
 type Action =
   | "view"
@@ -58,6 +59,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     financial_metrics: ["view"],
     notifications: ["send_invite", "send_notification"],
     reporting: ["view", "export"],
+    expenses: ["view", "create", "update", "delete", "approve", "export"],
   },
   admin: {
     dashboard: ["view"],
@@ -74,6 +76,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     financial_metrics: ["view"],
     notifications: ["send_invite"],
     reporting: ["view", "export"],
+    expenses: ["view"],
   },
   sales: {
     dashboard: ["view"],
@@ -90,6 +93,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     financial_metrics: [],
     notifications: ["send_invite"],
     reporting: [],
+    expenses: [],
   },
   compliance: {
     dashboard: ["view"],
@@ -106,6 +110,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     financial_metrics: [],
     notifications: [],
     reporting: [],
+    expenses: ["view"],
   },
   treasury: {
     dashboard: ["view"],
@@ -122,6 +127,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     financial_metrics: ["view"],
     notifications: [],
     reporting: ["view", "export"],
+    expenses: ["view"],
   },
   support: {
     dashboard: ["view"],
@@ -138,6 +144,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     financial_metrics: [],
     notifications: ["send_notification"],
     reporting: [],
+    expenses: [],
   },
   finance: {
     dashboard: ["view"],
@@ -154,6 +161,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     financial_metrics: ["view"],
     notifications: [],
     reporting: ["view", "export"],
+    expenses: ["view", "create", "update", "delete", "approve", "export"],
   },
 };
 
