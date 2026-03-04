@@ -12,6 +12,7 @@ import {
   UserPlus,
   BarChart3,
   FileBarChart,
+  Receipt,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth, type Resource, type UserRole } from "@/contexts/AuthContext";
@@ -43,6 +44,7 @@ const navItems: { title: string; url: string; icon: React.ElementType; resource:
   { title: "Approvals", url: "/approvals", icon: ShieldCheck, resource: "approvals" },
   { title: "Audit Logs", url: "/audit-logs", icon: ScrollText, resource: "audit_logs" },
   { title: "Financial Metrics", url: "/financial-metrics", icon: BarChart3, resource: "financial_metrics" },
+  { title: "Expenses", url: "/expenses", icon: Receipt, resource: "expenses" },
   { title: "Reports", url: "/reports", icon: FileBarChart, resource: "reporting" },
   { title: "Settings", url: "/settings", icon: Settings, resource: "settings" },
 ];
