@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, Download, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Filter, Download, ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/contexts/AuthContext";
 
 const mockTransactions = Array.from({ length: 25 }, (_, i) => ({
   id: `TXN-${78234 - i}`,
@@ -17,6 +18,9 @@ const mockTransactions = Array.from({ length: 25 }, (_, i) => ({
   rateUsed: (1 + Math.random() * 0.05).toFixed(4),
   fees: (Math.random() * 50).toFixed(2),
   reference: `REF-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+  riskFlag: i % 7 === 0,
+  bankDetails: `****${Math.floor(1000 + Math.random() * 9000)}`,
+  settlementRef: `STL-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
   createdAt: new Date(Date.now() - i * 3600000).toISOString(),
 }));
 
@@ -28,10 +32,12 @@ const statusClass: Record<string, string> = {
 };
 
 export default function Transactions() {
+  const { user, hasPermission } = useAuth();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
   const perPage = 10;
+  const role = user?.role;
 
   const filtered = mockTransactions.filter((tx) => {
     const matchSearch = tx.id.toLowerCase().includes(search.toLowerCase()) ||
@@ -44,16 +50,31 @@ export default function Transactions() {
   const paged = filtered.slice((page - 1) * perPage, page * perPage);
   const totalPages = Math.ceil(filtered.length / perPage);
 
+  // Role-based column visibility
+  const showAmount = role !== "sales";
+  const showReference = role !== "sales";
+  const showRateUsed = role === "treasury" || role === "super_admin" || role === "admin";
+  const showFees = role === "treasury" || role === "super_admin";
+  const showBankDetails = role !== "sales";
+  const showRiskFlag = role === "compliance" || role === "super_admin";
+  const showSettlement = role === "treasury" || role === "super_admin";
+  const canExport = hasPermission("transactions", "create") || role === "super_admin";
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Transactions</h1>
-          <p className="text-sm text-muted-foreground mt-1">{filtered.length} transactions found</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {filtered.length} transactions found
+            {role === "sales" && <span className="ml-2 text-warning text-xs">(Limited view)</span>}
+          </p>
         </div>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Download className="h-4 w-4" /> Export CSV
-        </Button>
+        {canExport && (
+          <Button variant="outline" size="sm" className="gap-2">
+            <Download className="h-4 w-4" /> Export CSV
+          </Button>
+        )}
       </div>
 
       <Card className="bg-card border-border">
@@ -91,10 +112,14 @@ export default function Transactions() {
                   <th className="data-table-header text-left py-3 px-2">ID</th>
                   <th className="data-table-header text-left py-3 px-2">Customer</th>
                   <th className="data-table-header text-left py-3 px-2">Type</th>
-                  <th className="data-table-header text-right py-3 px-2">Amount</th>
+                  {showAmount && <th className="data-table-header text-right py-3 px-2">Amount</th>}
                   <th className="data-table-header text-left py-3 px-2">Currency</th>
                   <th className="data-table-header text-center py-3 px-2">Status</th>
-                  <th className="data-table-header text-left py-3 px-2">Reference</th>
+                  {showRiskFlag && <th className="data-table-header text-center py-3 px-2">Risk</th>}
+                  {showRateUsed && <th className="data-table-header text-right py-3 px-2">Rate</th>}
+                  {showFees && <th className="data-table-header text-right py-3 px-2">Fees</th>}
+                  {showSettlement && <th className="data-table-header text-left py-3 px-2">Settlement</th>}
+                  {showReference && <th className="data-table-header text-left py-3 px-2">Reference</th>}
                   <th className="data-table-header text-right py-3 px-2">Date</th>
                 </tr>
               </thead>
@@ -104,12 +129,20 @@ export default function Transactions() {
                     <td className="py-3 px-2 font-mono text-sm text-primary">{tx.id}</td>
                     <td className="py-3 px-2 text-sm">{tx.customer}</td>
                     <td className="py-3 px-2 text-sm text-muted-foreground">{tx.type}</td>
-                    <td className="py-3 px-2 text-sm font-mono text-right">${tx.amount}</td>
+                    {showAmount && <td className="py-3 px-2 text-sm font-mono text-right">${tx.amount}</td>}
                     <td className="py-3 px-2 text-sm font-mono">{tx.currency}</td>
                     <td className="py-3 px-2 text-center">
                       <span className={statusClass[tx.status]}>{tx.status}</span>
                     </td>
-                    <td className="py-3 px-2 text-sm font-mono text-muted-foreground">{tx.reference}</td>
+                    {showRiskFlag && (
+                      <td className="py-3 px-2 text-center">
+                        {tx.riskFlag && <AlertTriangle className="h-4 w-4 text-warning inline-block" />}
+                      </td>
+                    )}
+                    {showRateUsed && <td className="py-3 px-2 text-sm font-mono text-right">{tx.rateUsed}</td>}
+                    {showFees && <td className="py-3 px-2 text-sm font-mono text-right">${tx.fees}</td>}
+                    {showSettlement && <td className="py-3 px-2 text-sm font-mono text-muted-foreground">{tx.settlementRef}</td>}
+                    {showReference && <td className="py-3 px-2 text-sm font-mono text-muted-foreground">{tx.reference}</td>}
                     <td className="py-3 px-2 text-sm text-muted-foreground text-right">
                       {new Date(tx.createdAt).toLocaleDateString()}
                     </td>
