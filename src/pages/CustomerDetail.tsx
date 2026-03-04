@@ -155,6 +155,11 @@ export default function CustomerDetail() {
               <Button variant="outline" size="sm" onClick={handleResendInvite} className="gap-1.5"><MailPlus className="h-3.5 w-3.5" /> Resend Invite</Button>
               <Button variant="outline" size="sm" onClick={handleRequestDocs} className="gap-1.5"><FileText className="h-3.5 w-3.5" /> Request Documents</Button>
               <Button variant="outline" size="sm" onClick={handleScheduleReview} className="gap-1.5"><ShieldCheck className="h-3.5 w-3.5" /> Schedule Review</Button>
+              {hasPermission("transactions", "act_on_behalf") && customer.status === "approved" && (
+                <Button size="sm" onClick={() => navigate(`/transact-on-behalf?customerId=${customer.id}`)} className="gap-1.5">
+                  <Send className="h-3.5 w-3.5" /> Initiate Transaction for Customer
+                </Button>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
