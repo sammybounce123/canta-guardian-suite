@@ -26,15 +26,16 @@ interface CustomerRow {
   wallets: number;
   createdAt: string;
   accountStatus: "active" | "suspended";
+  salesRepId: string;
 }
 
 const initialCustomers: CustomerRow[] = [
-  { id: "CUS-1000", name: "Folake Adeyemi", email: "folake@email.com", phone: "+234 801 234 5678", kycStatus: "verified", riskScore: "low", wallets: 3, createdAt: "2024-08-12", accountStatus: "active" },
-  { id: "CUS-1001", name: "Chinedu Obi", email: "chinedu@email.com", phone: "+234 802 345 6789", kycStatus: "pending", riskScore: "medium", wallets: 2, createdAt: "2024-09-03", accountStatus: "active" },
-  { id: "CUS-1002", name: "Amara Diallo", email: "amara@email.com", phone: "+233 20 345 6789", kycStatus: "verified", riskScore: "low", wallets: 4, createdAt: "2024-07-21", accountStatus: "active" },
-  { id: "CUS-1003", name: "Kwame Mensah", email: "kwame@email.com", phone: "+233 24 456 7890", kycStatus: "rejected", riskScore: "high", wallets: 1, createdAt: "2024-10-15", accountStatus: "suspended" },
-  { id: "CUS-1004", name: "Fatima Bello", email: "fatima@email.com", phone: "+234 803 567 8901", kycStatus: "verified", riskScore: "low", wallets: 2, createdAt: "2024-06-30", accountStatus: "active" },
-  { id: "CUS-1005", name: "Olu Adebayo", email: "olu@email.com", phone: "+234 805 678 9012", kycStatus: "pending", riskScore: "medium", wallets: 1, createdAt: "2024-11-01", accountStatus: "active" },
+  { id: "CUS-1000", name: "Folake Adeyemi", email: "folake@email.com", phone: "+234 801 234 5678", kycStatus: "verified", riskScore: "low", wallets: 3, createdAt: "2024-08-12", accountStatus: "active", salesRepId: "usr_003" },
+  { id: "CUS-1001", name: "Chinedu Obi", email: "chinedu@email.com", phone: "+234 802 345 6789", kycStatus: "pending", riskScore: "medium", wallets: 2, createdAt: "2024-09-03", accountStatus: "active", salesRepId: "usr_003" },
+  { id: "CUS-1002", name: "Amara Diallo", email: "amara@email.com", phone: "+233 20 345 6789", kycStatus: "verified", riskScore: "low", wallets: 4, createdAt: "2024-07-21", accountStatus: "active", salesRepId: "usr_006" },
+  { id: "CUS-1003", name: "Kwame Mensah", email: "kwame@email.com", phone: "+233 24 456 7890", kycStatus: "rejected", riskScore: "high", wallets: 1, createdAt: "2024-10-15", accountStatus: "suspended", salesRepId: "usr_006" },
+  { id: "CUS-1004", name: "Fatima Bello", email: "fatima@email.com", phone: "+234 803 567 8901", kycStatus: "verified", riskScore: "low", wallets: 2, createdAt: "2024-06-30", accountStatus: "active", salesRepId: "usr_003" },
+  { id: "CUS-1005", name: "Olu Adebayo", email: "olu@email.com", phone: "+234 805 678 9012", kycStatus: "pending", riskScore: "medium", wallets: 1, createdAt: "2024-11-01", accountStatus: "active", salesRepId: "usr_006" },
 ];
 
 const kycClass: Record<string, string> = {
@@ -58,7 +59,12 @@ export default function Customers() {
   // Compliance or super_admin can suspend customer accounts
   const canSuspendCustomer = hasPermission("customers", "update") && (user?.role === "compliance" || user?.role === "super_admin");
 
-  const filtered = customers.filter((c) =>
+  // Sales reps only see their own customers; other roles see all
+  const visibleCustomers = user?.role === "sales"
+    ? customers.filter((c) => c.salesRepId === user.id)
+    : customers;
+
+  const filtered = visibleCustomers.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
     c.email.toLowerCase().includes(search.toLowerCase()) ||
     c.id.toLowerCase().includes(search.toLowerCase())

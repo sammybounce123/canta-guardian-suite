@@ -40,7 +40,10 @@ export default function CustomerDetail() {
   const [localNotes, setLocalNotes] = useState<SalesNote[]>(notes);
   const [tag, setTag] = useState<CustomerTag | undefined>(customer?.tag);
 
-  if (!customer) {
+  // Sales reps can only view their own customers
+  const isSalesRestricted = user?.role === "sales" && customer && customer.salesRepId !== user.id;
+
+  if (!customer || isSalesRestricted) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <AlertCircle className="h-10 w-10 text-muted-foreground mb-3" />

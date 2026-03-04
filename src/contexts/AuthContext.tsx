@@ -108,12 +108,12 @@ const mockUser: InternalUser = {
   lastLogin: new Date().toISOString(),
 };
 
-const roleNames: Record<UserRole, string> = {
-  super_admin: "Adeyemi Okonkwo",
-  admin: "Sarah Chen",
-  sales: "John Doe",
-  compliance: "Aisha Compliance",
-  treasury: "Treasury Lead",
+const roleProfiles: Record<UserRole, { name: string; id: string }> = {
+  super_admin: { name: "Adeyemi Okonkwo", id: "usr_001" },
+  admin: { name: "Sarah Chen", id: "usr_002" },
+  sales: { name: "John Doe", id: "usr_003" },
+  compliance: { name: "Aisha Compliance", id: "usr_004" },
+  treasury: { name: "Treasury Lead", id: "usr_005" },
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -127,7 +127,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => setUser(null);
 
   const switchRole = (role: UserRole) => {
-    setUser(prev => prev ? { ...prev, role, name: roleNames[role] } : null);
+    const profile = roleProfiles[role];
+    setUser(prev => prev ? { ...prev, role, name: profile.name, id: profile.id } : null);
   };
 
   const hasPermission = (resource: Resource, action: Action): boolean => {
