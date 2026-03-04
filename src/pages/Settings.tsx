@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,9 +7,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
-import { Plus, Shield, Users, Key, Lock } from "lucide-react";
+import { Plus, Shield, Users, Key, Lock, Ban, CheckCircle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
-const mockInternalUsers = [
+interface InternalUserRow {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  lastLogin: string;
+}
+
+const initialUsers: InternalUserRow[] = [
   { id: "usr_001", name: "Adeyemi Okonkwo", email: "adeyemi@cantaops.com", role: "super_admin", status: "active", lastLogin: "2024-11-15 09:00" },
   { id: "usr_002", name: "Sarah Chen", email: "sarah@cantaops.com", role: "admin", status: "active", lastLogin: "2024-11-15 08:30" },
   { id: "usr_003", name: "John Doe", email: "john@cantaops.com", role: "sales", status: "active", lastLogin: "2024-11-14 17:45" },
@@ -30,9 +51,25 @@ export default function Settings() {
   const canUpdate = hasPermission("settings", "update");
   const canManageUsers = hasPermission("internal_users", "create");
   const canViewUsers = hasPermission("internal_users", "view");
+  const canDeleteUsers = hasPermission("internal_users", "delete");
 
-  // Admin: view-only settings, no user management actions
-  // Sales/Compliance/Treasury: should not even reach this page (routed away), but show limited view
+  const [internalUsers, setInternalUsers] = useState<InternalUserRow[]>(initialUsers);
+  const [suspendTarget, setSuspendTarget] = useState<InternalUserRow | null>(null);
+
+  const handleToggleSuspend = () => {
+    if (!suspendTarget) return;
+    setInternalUsers((prev) =>
+      prev.map((u) =>
+        u.id === suspendTarget.id
+          ? { ...u, status: u.status === "active" ? "suspended" : "active" }
+          : u
+      )
+    );
+    const action = suspendTarget.status === "active" ? "suspended" : "reactivated";
+    toast.success(`${suspendTarget.name} has been ${action}.`);
+    setSuspendTarget(null);
+  };
+
   if (!hasPermission("settings", "view")) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -82,11 +119,11 @@ export default function Settings() {
                         <th className="data-table-header text-center py-3 px-2">Role</th>
                         <th className="data-table-header text-center py-3 px-2">Status</th>
                         <th className="data-table-header text-right py-3 px-2">Last Login</th>
-                        {canManageUsers && <th className="data-table-header text-center py-3 px-2">Actions</th>}
+                        {canDeleteUsers && <th className="data-table-header text-center py-3 px-2">Actions</th>}
                       </tr>
                     </thead>
                     <tbody>
-                      {mockInternalUsers.map((u) => (
+                      {internalUsers.map((u) => (
                         <tr key={u.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                           <td className="py-3 px-2 text-sm font-medium">{u.name}</td>
                           <td className="py-3 px-2 text-sm text-muted-foreground">{u.email}</td>
@@ -96,14 +133,35 @@ export default function Settings() {
                             </span>
                           </td>
                           <td className="py-3 px-2 text-center">
-                            <span className={u.status === "active" ? "status-badge status-completed" : "status-badge status-held"}>
+                            <span className={
+                              u.status === "active"
+                                ? "status-badge status-completed"
+                                : u.status === "suspended"
+                                ? "status-badge status-failed"
+                                : "status-badge status-held"
+                            }>
                               {u.status}
                             </span>
                           </td>
                           <td className="py-3 px-2 text-sm text-muted-foreground text-right font-mono">{u.lastLogin}</td>
-                          {canManageUsers && (
+                          {canDeleteUsers && (
                             <td className="py-3 px-2 text-center">
-                              <Button variant="ghost" size="sm" className="text-xs">Edit</Button>
+                              {u.role !== "super_admin" ? (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className={`text-xs gap-1.5 ${u.status === "active" ? "text-destructive hover:text-destructive" : "text-success hover:text-success"}`}
+                                  onClick={() => setSuspendTarget(u)}
+                                >
+                                  {u.status === "active" ? (
+                                    <><Ban className="h-3.5 w-3.5" /> Suspend</>
+                                  ) : (
+                                    <><CheckCircle className="h-3.5 w-3.5" /> Reactivate</>
+                                  )}
+                                </Button>
+                              ) : (
+                                <span className="text-xs text-muted-foreground">—</span>
+                              )}
                             </td>
                           )}
                         </tr>
@@ -173,6 +231,28 @@ export default function Settings() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Suspend/Reactivate confirmation dialog */}
+      <AlertDialog open={!!suspendTarget} onOpenChange={(open) => !open && setSuspendTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {suspendTarget?.status === "active" ? "Suspend User" : "Reactivate User"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {suspendTarget?.status === "active"
+                ? `Are you sure you want to suspend ${suspendTarget?.name}? They will lose access to the portal immediately.`
+                : `Are you sure you want to reactivate ${suspendTarget?.name}? They will regain portal access.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleToggleSuspend}>
+              {suspendTarget?.status === "active" ? "Suspend" : "Reactivate"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
