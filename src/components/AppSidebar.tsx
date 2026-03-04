@@ -10,6 +10,8 @@ import {
   LogOut,
   ChevronDown,
   UserPlus,
+  BarChart3,
+  FileBarChart,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth, type Resource, type UserRole } from "@/contexts/AuthContext";
@@ -40,6 +42,8 @@ const navItems: { title: string; url: string; icon: React.ElementType; resource:
   { title: "Virtual Accounts", url: "/virtual-accounts", icon: Building2, resource: "virtual_accounts" },
   { title: "Approvals", url: "/approvals", icon: ShieldCheck, resource: "approvals" },
   { title: "Audit Logs", url: "/audit-logs", icon: ScrollText, resource: "audit_logs" },
+  { title: "Financial Metrics", url: "/financial-metrics", icon: BarChart3, resource: "financial_metrics" },
+  { title: "Reports", url: "/reports", icon: FileBarChart, resource: "reporting" },
   { title: "Settings", url: "/settings", icon: Settings, resource: "settings" },
 ];
 
@@ -49,6 +53,8 @@ const allRoles: { value: UserRole; label: string }[] = [
   { value: "sales", label: "Sales" },
   { value: "compliance", label: "Compliance" },
   { value: "treasury", label: "Treasury" },
+  { value: "support", label: "Support" },
+  { value: "finance", label: "Finance" },
 ];
 
 const roleBadgeColor: Record<UserRole, string> = {
@@ -57,6 +63,8 @@ const roleBadgeColor: Record<UserRole, string> = {
   sales: "bg-warning/20 text-warning",
   compliance: "bg-destructive/20 text-destructive",
   treasury: "bg-accent/20 text-accent-foreground",
+  support: "bg-muted text-muted-foreground",
+  finance: "bg-primary/10 text-primary",
 };
 
 export function AppSidebar() {

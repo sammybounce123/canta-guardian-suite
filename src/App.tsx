@@ -19,6 +19,8 @@ import Onboarding from "./pages/Onboarding";
 import OnboardingWizard from "./pages/OnboardingWizard";
 import CustomerDetail from "./pages/CustomerDetail";
 import CustomerOnboarding from "./pages/CustomerOnboarding";
+import FinancialMetrics from "./pages/FinancialMetrics";
+import Reports from "./pages/Reports";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +45,8 @@ const App = () => (
             <Route path="/approvals" element={<AppLayout><Approvals /></AppLayout>} />
             <Route path="/audit-logs" element={<AppLayout><AuditLogs /></AppLayout>} />
             <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
+            <Route path="/financial-metrics" element={<AppLayout><FinancialMetrics /></AppLayout>} />
+            <Route path="/reports" element={<AppLayout><Reports /></AppLayout>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
