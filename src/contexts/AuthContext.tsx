@@ -20,7 +20,8 @@ type Resource =
   | "approvals"
   | "audit_logs"
   | "settings"
-  | "internal_users";
+  | "internal_users"
+  | "onboarding";
 
 type Action = "view" | "create" | "update" | "delete" | "approve" | "act_on_behalf";
 
@@ -35,6 +36,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     audit_logs: ["view"],
     settings: ["view", "update"],
     internal_users: ["view", "create", "update", "delete"],
+    onboarding: ["view", "create", "update"],
   },
   admin: {
     dashboard: ["view"],
@@ -46,6 +48,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     audit_logs: ["view"],
     settings: ["view"],
     internal_users: ["view"],
+    onboarding: ["view", "create", "update"],
   },
   sales: {
     dashboard: ["view"],
@@ -57,6 +60,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     audit_logs: [],
     settings: [],
     internal_users: [],
+    onboarding: ["view", "create", "update"],
   },
   compliance: {
     dashboard: ["view"],
@@ -68,6 +72,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     audit_logs: ["view"],
     settings: [],
     internal_users: [],
+    onboarding: ["view"],
   },
   treasury: {
     dashboard: ["view"],
@@ -79,6 +84,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     audit_logs: ["view"],
     settings: [],
     internal_users: [],
+    onboarding: [],
   },
 };
 

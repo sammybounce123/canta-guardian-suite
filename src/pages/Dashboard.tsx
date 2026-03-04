@@ -1,5 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowUpRight, ArrowDownRight, DollarSign, Users, ArrowLeftRight, AlertTriangle, TrendingUp, Building2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowUpRight, ArrowDownRight, DollarSign, Users, ArrowLeftRight, AlertTriangle, TrendingUp, Building2, UserPlus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const allStats = [
@@ -28,6 +30,7 @@ const statusClass: Record<string, string> = {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const role = user?.role ?? "sales";
 
   const visibleStats = allStats.filter((s) => s.roles.includes(role));
@@ -35,15 +38,22 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-1">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Dashboard</h1>
+          <p className="text-sm text-muted-foreground mt-1">
           {role === "sales" && "Customer overview and onboarding metrics"}
           {role === "compliance" && "Compliance queue and review metrics"}
           {role === "treasury" && "Treasury overview, volumes, and rates"}
           {role === "admin" && "Operations overview"}
           {role === "super_admin" && "Full operations overview"}
-        </p>
+          </p>
+        </div>
+        {(role === "sales" || role === "admin" || role === "super_admin") && (
+          <Button onClick={() => navigate("/onboarding/new")} className="gap-2">
+            <UserPlus className="h-4 w-4" /> Onboard Customer
+          </Button>
+        )}
       </div>
 
       <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${Math.min(visibleStats.length, 4)} gap-4`}>
