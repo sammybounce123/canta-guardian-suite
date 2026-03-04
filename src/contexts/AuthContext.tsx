@@ -114,7 +114,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
   },
   treasury: {
     dashboard: ["view"],
-    transactions: ["view", "update", "act_on_behalf"],
+    transactions: ["view", "update"],
     customers: ["view"],
     rates: ["view", "create", "update"],
     virtual_accounts: ["view", "create"],
