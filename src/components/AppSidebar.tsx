@@ -9,6 +9,7 @@ import {
   Settings,
   LogOut,
   ChevronDown,
+  UserPlus,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth, type Resource, type UserRole } from "@/contexts/AuthContext";
@@ -32,6 +33,7 @@ import {
 
 const navItems: { title: string; url: string; icon: React.ElementType; resource: Resource }[] = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard, resource: "dashboard" },
+  { title: "Onboarding", url: "/onboarding", icon: UserPlus, resource: "onboarding" },
   { title: "Transactions", url: "/transactions", icon: ArrowLeftRight, resource: "transactions" },
   { title: "Customers", url: "/customers", icon: Users, resource: "customers" },
   { title: "Rates & Treasury", url: "/rates", icon: TrendingUp, resource: "rates" },

@@ -15,6 +15,9 @@ import AuditLogs from "./pages/AuditLogs";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import Onboarding from "./pages/Onboarding";
+import OnboardingWizard from "./pages/OnboardingWizard";
+import CustomerDetail from "./pages/CustomerDetail";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +31,9 @@ const App = () => (
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<AppLayout><Dashboard /></AppLayout>} />
+            <Route path="/onboarding" element={<AppLayout><Onboarding /></AppLayout>} />
+            <Route path="/onboarding/:id" element={<AppLayout><OnboardingWizard /></AppLayout>} />
+            <Route path="/onboarding/:id/detail" element={<AppLayout><CustomerDetail /></AppLayout>} />
             <Route path="/transactions" element={<AppLayout><Transactions /></AppLayout>} />
             <Route path="/customers" element={<AppLayout><Customers /></AppLayout>} />
             <Route path="/rates" element={<AppLayout><Rates /></AppLayout>} />
