@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import Onboarding from "./pages/Onboarding";
 import OnboardingWizard from "./pages/OnboardingWizard";
 import CustomerDetail from "./pages/CustomerDetail";
+import CustomerOnboarding from "./pages/CustomerOnboarding";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/onboard" element={<CustomerOnboarding />} />
             <Route path="/" element={<AppLayout><Dashboard /></AppLayout>} />
             <Route path="/onboarding" element={<AppLayout><Onboarding /></AppLayout>} />
             <Route path="/onboarding/:id" element={<AppLayout><OnboardingWizard /></AppLayout>} />
