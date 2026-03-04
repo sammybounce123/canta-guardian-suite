@@ -106,10 +106,13 @@ export default function TransactOnBehalf() {
 
   useEffect(() => {
     if (rateExpiry === 0 && wizard.rateLocked) {
-      setWizard((w) => ({ ...w, rateLocked: false, fxQuote: null }));
-      toast.error("Rate expired. Please get a new quote.");
+      if (wizard.step <= 1) {
+        setWizard((w) => ({ ...w, rateLocked: false, fxQuote: null }));
+        toast.error("Rate expired. Please get a new quote.");
+      }
+      // Don't reset rate if user has already moved past the FX quote step
     }
-  }, [rateExpiry, wizard.rateLocked]);
+  }, [rateExpiry, wizard.rateLocked, wizard.step]);
 
   const generateQuote = useCallback(() => {
     const rateInfo = mockFxRates[wizard.selectedCurrency];
