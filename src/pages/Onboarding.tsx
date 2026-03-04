@@ -25,7 +25,12 @@ export default function Onboarding() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const filtered = mockOnboardingDrafts.filter((d) => {
+  // Sales reps only see their own onboarding records
+  const visibleDrafts = user?.role === "sales"
+    ? mockOnboardingDrafts.filter((d) => d.salesRepId === user.id)
+    : mockOnboardingDrafts;
+
+  const filtered = visibleDrafts.filter((d) => {
     const matchSearch =
       !search ||
       d.fullName?.toLowerCase().includes(search.toLowerCase()) ||
@@ -36,12 +41,12 @@ export default function Onboarding() {
   });
 
   const counts = {
-    all: mockOnboardingDrafts.length,
-    draft: mockOnboardingDrafts.filter((d) => d.status === "draft").length,
-    submitted: mockOnboardingDrafts.filter((d) => d.status === "submitted").length,
-    under_review: mockOnboardingDrafts.filter((d) => d.status === "under_review").length,
-    approved: mockOnboardingDrafts.filter((d) => d.status === "approved").length,
-    rejected: mockOnboardingDrafts.filter((d) => d.status === "rejected").length,
+    all: visibleDrafts.length,
+    draft: visibleDrafts.filter((d) => d.status === "draft").length,
+    submitted: visibleDrafts.filter((d) => d.status === "submitted").length,
+    under_review: visibleDrafts.filter((d) => d.status === "under_review").length,
+    approved: visibleDrafts.filter((d) => d.status === "approved").length,
+    rejected: visibleDrafts.filter((d) => d.status === "rejected").length,
   };
 
   return (
