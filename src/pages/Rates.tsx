@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Edit2, Eye, RefreshCw } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const mockRates = [
   { pair: "USD/NGN", buy: "1,580.00", sell: "1,595.00", mid: "1,587.50", source: "Manual", updatedBy: "Treasury Ops", updatedAt: "5 min ago" },
@@ -13,6 +14,9 @@ const mockRates = [
 ];
 
 export default function Rates() {
+  const { hasPermission } = useAuth();
+  const canEdit = hasPermission("rates", "update");
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -86,9 +90,11 @@ export default function Rates() {
                     <td className="py-3 px-2 text-sm text-muted-foreground">{r.updatedBy}</td>
                     <td className="py-3 px-2 text-sm text-muted-foreground text-right">{r.updatedAt}</td>
                     <td className="py-3 px-2 text-right">
-                      <button className="p-1.5 rounded-md hover:bg-muted transition-colors">
-                        <Edit2 className="h-4 w-4 text-muted-foreground" />
-                      </button>
+                      {canEdit && (
+                        <button className="p-1.5 rounded-md hover:bg-muted transition-colors">
+                          <Edit2 className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
