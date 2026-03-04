@@ -8,9 +8,10 @@ import {
   ScrollText,
   Settings,
   LogOut,
+  ChevronDown,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useAuth, type Resource } from "@/contexts/AuthContext";
+import { useAuth, type Resource, type UserRole } from "@/contexts/AuthContext";
 import {
   Sidebar,
   SidebarContent,
@@ -22,6 +23,12 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const navItems: { title: string; url: string; icon: React.ElementType; resource: Resource }[] = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard, resource: "dashboard" },
@@ -34,8 +41,24 @@ const navItems: { title: string; url: string; icon: React.ElementType; resource:
   { title: "Settings", url: "/settings", icon: Settings, resource: "settings" },
 ];
 
+const allRoles: { value: UserRole; label: string }[] = [
+  { value: "super_admin", label: "Super Admin" },
+  { value: "admin", label: "Admin" },
+  { value: "sales", label: "Sales" },
+  { value: "compliance", label: "Compliance" },
+  { value: "treasury", label: "Treasury" },
+];
+
+const roleBadgeColor: Record<UserRole, string> = {
+  super_admin: "bg-primary/20 text-primary",
+  admin: "bg-success/20 text-success",
+  sales: "bg-warning/20 text-warning",
+  compliance: "bg-destructive/20 text-destructive",
+  treasury: "bg-accent/20 text-accent-foreground",
+};
+
 export function AppSidebar() {
-  const { user, logout, canAccessRoute } = useAuth();
+  const { user, logout, canAccessRoute, switchRole } = useAuth();
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
 
@@ -82,7 +105,26 @@ export function AppSidebar() {
         {user && !collapsed && (
           <div className="px-4 py-3 border-t border-sidebar-border">
             <p className="text-sm font-medium text-sidebar-accent-foreground truncate">{user.name}</p>
-            <p className="text-xs text-muted-foreground capitalize">{user.role.replace("_", " ")}</p>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1.5 mt-0.5 outline-none">
+                <span className={`text-xs font-medium capitalize px-2 py-0.5 rounded-full ${roleBadgeColor[user.role]}`}>
+                  {user.role.replace("_", " ")}
+                </span>
+                <ChevronDown className="h-3 w-3 text-muted-foreground" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-44">
+                {allRoles.map((r) => (
+                  <DropdownMenuItem
+                    key={r.value}
+                    onClick={() => switchRole(r.value)}
+                    className={user.role === r.value ? "bg-muted font-medium" : ""}
+                  >
+                    <span className={`w-2 h-2 rounded-full mr-2 ${roleBadgeColor[r.value].split(" ")[0]}`} />
+                    {r.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
         <SidebarMenu>

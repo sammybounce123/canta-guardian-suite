@@ -88,6 +88,7 @@ interface AuthContextType {
   logout: () => void;
   hasPermission: (resource: Resource, action: Action) => boolean;
   canAccessRoute: (resource: Resource) => boolean;
+  switchRole: (role: UserRole) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -101,6 +102,14 @@ const mockUser: InternalUser = {
   lastLogin: new Date().toISOString(),
 };
 
+const roleNames: Record<UserRole, string> = {
+  super_admin: "Adeyemi Okonkwo",
+  admin: "Sarah Chen",
+  sales: "John Doe",
+  compliance: "Aisha Compliance",
+  treasury: "Treasury Lead",
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<InternalUser | null>(mockUser);
 
@@ -110,6 +119,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => setUser(null);
+
+  const switchRole = (role: UserRole) => {
+    setUser(prev => prev ? { ...prev, role, name: roleNames[role] } : null);
+  };
 
   const hasPermission = (resource: Resource, action: Action): boolean => {
     if (!user) return false;
@@ -124,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, hasPermission, canAccessRoute }}>
+    <AuthContext.Provider value={{ user, login, logout, hasPermission, canAccessRoute, switchRole }}>
       {children}
     </AuthContext.Provider>
   );
