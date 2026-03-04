@@ -22,6 +22,7 @@ import CustomerOnboarding from "./pages/CustomerOnboarding";
 import FinancialMetrics from "./pages/FinancialMetrics";
 import Reports from "./pages/Reports";
 import Expenses from "./pages/Expenses";
+import TransactOnBehalf from "./pages/TransactOnBehalf";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/financial-metrics" element={<AppLayout><FinancialMetrics /></AppLayout>} />
             <Route path="/expenses" element={<AppLayout><Expenses /></AppLayout>} />
             <Route path="/reports" element={<AppLayout><Reports /></AppLayout>} />
+            <Route path="/transact-on-behalf" element={<AppLayout><TransactOnBehalf /></AppLayout>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
