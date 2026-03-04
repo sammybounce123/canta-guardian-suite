@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-export type UserRole = "super_admin" | "admin" | "sales" | "compliance" | "treasury";
+export type UserRole = "super_admin" | "admin" | "sales" | "compliance" | "treasury" | "support" | "finance";
 
 export interface InternalUser {
   id: string;
@@ -21,15 +21,32 @@ type Resource =
   | "audit_logs"
   | "settings"
   | "internal_users"
-  | "onboarding";
+  | "onboarding"
+  | "kyc"
+  | "financial_metrics"
+  | "notifications"
+  | "reporting";
 
-type Action = "view" | "create" | "update" | "delete" | "approve" | "act_on_behalf";
+type Action =
+  | "view"
+  | "create"
+  | "update"
+  | "delete"
+  | "approve"
+  | "act_on_behalf"
+  | "freeze"
+  | "unfreeze"
+  | "export"
+  | "retry"
+  | "cancel"
+  | "send_invite"
+  | "send_notification";
 
 const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = {
   super_admin: {
     dashboard: ["view"],
-    transactions: ["view", "create", "update", "delete", "approve", "act_on_behalf"],
-    customers: ["view", "create", "update", "delete"],
+    transactions: ["view", "create", "update", "delete", "approve", "act_on_behalf", "export", "retry", "cancel"],
+    customers: ["view", "create", "update", "delete", "freeze", "unfreeze"],
     rates: ["view", "create", "update", "approve"],
     virtual_accounts: ["view", "create", "update", "delete"],
     approvals: ["view", "approve"],
@@ -37,35 +54,47 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     settings: ["view", "update"],
     internal_users: ["view", "create", "update", "delete"],
     onboarding: ["view", "create", "update"],
+    kyc: ["view", "approve", "update", "delete"],
+    financial_metrics: ["view"],
+    notifications: ["send_invite", "send_notification"],
+    reporting: ["view", "export"],
   },
   admin: {
     dashboard: ["view"],
-    transactions: ["view", "create", "update", "act_on_behalf"],
+    transactions: ["view", "create", "update", "act_on_behalf", "export"],
     customers: ["view", "create", "update"],
     rates: ["view", "create", "update"],
     virtual_accounts: ["view", "create", "update"],
     approvals: ["view", "approve"],
     audit_logs: ["view"],
     settings: ["view"],
-    internal_users: ["view"],
+    internal_users: ["view", "create", "update"],
     onboarding: ["view", "create", "update"],
+    kyc: ["view"],
+    financial_metrics: ["view"],
+    notifications: ["send_invite"],
+    reporting: ["view", "export"],
   },
   sales: {
     dashboard: ["view"],
     transactions: ["view"],
     customers: ["view", "create"],
     rates: ["view"],
-    virtual_accounts: ["view"],
+    virtual_accounts: ["view", "create"],
     approvals: [],
     audit_logs: [],
     settings: [],
     internal_users: [],
     onboarding: ["view", "create", "update"],
+    kyc: [],
+    financial_metrics: [],
+    notifications: ["send_invite"],
+    reporting: [],
   },
   compliance: {
     dashboard: ["view"],
     transactions: ["view", "update"],
-    customers: ["view", "update"],
+    customers: ["view", "update", "freeze", "unfreeze"],
     rates: ["view"],
     virtual_accounts: ["view"],
     approvals: ["view", "approve"],
@@ -73,10 +102,14 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     settings: [],
     internal_users: [],
     onboarding: ["view"],
+    kyc: ["view", "approve", "update", "delete"],
+    financial_metrics: [],
+    notifications: [],
+    reporting: [],
   },
   treasury: {
     dashboard: ["view"],
-    transactions: ["view", "update"],
+    transactions: ["view", "update", "act_on_behalf"],
     customers: ["view"],
     rates: ["view", "create", "update"],
     virtual_accounts: ["view", "create"],
@@ -85,6 +118,42 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
     settings: [],
     internal_users: [],
     onboarding: [],
+    kyc: [],
+    financial_metrics: ["view"],
+    notifications: [],
+    reporting: ["view", "export"],
+  },
+  support: {
+    dashboard: ["view"],
+    transactions: ["view", "retry"],
+    customers: ["view", "update"],
+    rates: [],
+    virtual_accounts: ["view"],
+    approvals: [],
+    audit_logs: [],
+    settings: [],
+    internal_users: [],
+    onboarding: [],
+    kyc: [],
+    financial_metrics: [],
+    notifications: ["send_notification"],
+    reporting: [],
+  },
+  finance: {
+    dashboard: ["view"],
+    transactions: ["view", "export"],
+    customers: ["view"],
+    rates: [],
+    virtual_accounts: [],
+    approvals: [],
+    audit_logs: [],
+    settings: [],
+    internal_users: [],
+    onboarding: [],
+    kyc: [],
+    financial_metrics: ["view"],
+    notifications: [],
+    reporting: ["view", "export"],
   },
 };
 
@@ -114,6 +183,8 @@ const roleProfiles: Record<UserRole, { name: string; id: string }> = {
   sales: { name: "John Doe", id: "usr_003" },
   compliance: { name: "Aisha Compliance", id: "usr_004" },
   treasury: { name: "Treasury Lead", id: "usr_005" },
+  support: { name: "David Support", id: "usr_006" },
+  finance: { name: "Grace Finance", id: "usr_007" },
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {

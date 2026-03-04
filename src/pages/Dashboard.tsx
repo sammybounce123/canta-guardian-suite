@@ -5,12 +5,14 @@ import { ArrowUpRight, ArrowDownRight, DollarSign, Users, ArrowLeftRight, AlertT
 import { useAuth } from "@/contexts/AuthContext";
 
 const allStats = [
-  { title: "Total Volume (24h)", value: "$2,847,392", change: "+12.5%", up: true, icon: DollarSign, roles: ["super_admin", "admin", "treasury"] },
-  { title: "Active Customers", value: "3,284", change: "+4.2%", up: true, icon: Users, roles: ["super_admin", "admin", "sales", "compliance"] },
-  { title: "Transactions (24h)", value: "1,847", change: "-2.1%", up: false, icon: ArrowLeftRight, roles: ["super_admin", "admin", "treasury", "compliance"] },
+  { title: "Total Volume (24h)", value: "$2,847,392", change: "+12.5%", up: true, icon: DollarSign, roles: ["super_admin", "admin", "treasury", "finance"] },
+  { title: "Active Customers", value: "3,284", change: "+4.2%", up: true, icon: Users, roles: ["super_admin", "admin", "sales", "compliance", "support"] },
+  { title: "Transactions (24h)", value: "1,847", change: "-2.1%", up: false, icon: ArrowLeftRight, roles: ["super_admin", "admin", "treasury", "compliance", "finance"] },
   { title: "Pending Reviews", value: "23", change: "+8", up: false, icon: AlertTriangle, roles: ["super_admin", "admin", "compliance"] },
   { title: "Avg Rate Spread", value: "1.32%", change: "-0.05%", up: true, icon: TrendingUp, roles: ["super_admin", "treasury"] },
   { title: "Active VAs", value: "1,204", change: "+15", up: true, icon: Building2, roles: ["super_admin", "admin", "treasury"] },
+  { title: "Total Payouts", value: "$1,234,567", change: "+6.3%", up: true, icon: DollarSign, roles: ["super_admin", "treasury", "admin", "finance"] },
+  { title: "Open Tickets", value: "12", change: "-3", up: true, icon: AlertTriangle, roles: ["support"] },
 ];
 
 const recentTransactions = [
@@ -34,7 +36,7 @@ export default function Dashboard() {
   const role = user?.role ?? "sales";
 
   const visibleStats = allStats.filter((s) => s.roles.includes(role));
-  const showAmount = role !== "sales";
+  const showAmount = role !== "sales" && role !== "support";
 
   return (
     <div className="space-y-6">
@@ -47,6 +49,8 @@ export default function Dashboard() {
           {role === "treasury" && "Treasury overview, volumes, and rates"}
           {role === "admin" && "Operations overview"}
           {role === "super_admin" && "Full operations overview"}
+          {role === "support" && "Customer support and ticket overview"}
+          {role === "finance" && "Financial reporting and metrics"}
           </p>
         </div>
         {(role === "sales" || role === "admin" || role === "super_admin") && (

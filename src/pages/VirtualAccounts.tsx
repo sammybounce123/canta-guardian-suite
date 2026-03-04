@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Copy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
 
 const mockVAs = [
   { id: "VA-001", customer: "Folake Adeyemi", accountName: "Folake Adeyemi", accountNumber: "0123456789", bank: "Sterling Bank", provider: "Provider A", status: "active", createdAt: "2024-10-01" },
@@ -11,6 +12,8 @@ const mockVAs = [
 ];
 
 export default function VirtualAccounts() {
+  const { hasPermission } = useAuth();
+  const canCreate = hasPermission("virtual_accounts", "create");
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -18,9 +21,11 @@ export default function VirtualAccounts() {
           <h1 className="text-2xl font-semibold">Virtual Accounts</h1>
           <p className="text-sm text-muted-foreground mt-1">Generate and manage virtual accounts for customers</p>
         </div>
-        <Button size="sm" className="gap-2">
-          <Plus className="h-4 w-4" /> Generate VA
-        </Button>
+        {canCreate && (
+          <Button size="sm" className="gap-2">
+            <Plus className="h-4 w-4" /> Generate VA
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

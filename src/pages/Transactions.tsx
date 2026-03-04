@@ -51,14 +51,14 @@ export default function Transactions() {
   const totalPages = Math.ceil(filtered.length / perPage);
 
   // Role-based column visibility
-  const showAmount = role !== "sales";
-  const showReference = role !== "sales";
+  const showAmount = role !== "sales" && role !== "support";
+  const showReference = role !== "sales" && role !== "support";
   const showRateUsed = role === "treasury" || role === "super_admin" || role === "admin";
   const showFees = role === "treasury" || role === "super_admin";
-  const showBankDetails = role !== "sales";
+  const showBankDetails = role !== "sales" && role !== "support";
   const showRiskFlag = role === "compliance" || role === "super_admin";
   const showSettlement = role === "treasury" || role === "super_admin";
-  const canExport = hasPermission("transactions", "create") || role === "super_admin";
+  const canExport = hasPermission("transactions", "export");
 
   return (
     <div className="space-y-6">
@@ -67,7 +67,7 @@ export default function Transactions() {
           <h1 className="text-2xl font-semibold">Transactions</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {filtered.length} transactions found
-            {role === "sales" && <span className="ml-2 text-warning text-xs">(Limited view)</span>}
+            {(role === "sales" || role === "support" || role === "finance") && <span className="ml-2 text-warning text-xs">(Limited view)</span>}
           </p>
         </div>
         {canExport && (

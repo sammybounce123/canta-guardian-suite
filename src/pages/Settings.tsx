@@ -35,6 +35,8 @@ const initialUsers: InternalUserRow[] = [
   { id: "usr_003", name: "John Doe", email: "john@cantaops.com", role: "sales", status: "active", lastLogin: "2024-11-14 17:45" },
   { id: "usr_004", name: "Aisha Compliance", email: "aisha@cantaops.com", role: "compliance", status: "active", lastLogin: "2024-11-15 10:00" },
   { id: "usr_005", name: "Treasury Lead", email: "treasury@cantaops.com", role: "treasury", status: "disabled", lastLogin: "2024-11-10 14:00" },
+  { id: "usr_006", name: "David Support", email: "david@cantaops.com", role: "support", status: "active", lastLogin: "2024-11-15 11:00" },
+  { id: "usr_007", name: "Grace Finance", email: "grace@cantaops.com", role: "finance", status: "active", lastLogin: "2024-11-15 09:30" },
 ];
 
 const roleColor: Record<string, string> = {
@@ -43,6 +45,8 @@ const roleColor: Record<string, string> = {
   sales: "text-warning",
   compliance: "text-destructive",
   treasury: "text-accent-foreground",
+  support: "text-muted-foreground",
+  finance: "text-primary",
 };
 
 export default function Settings() {
