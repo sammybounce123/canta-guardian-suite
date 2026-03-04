@@ -227,7 +227,14 @@ export default function TransactOnBehalf() {
     switch (wizard.step) {
       case 0: return wizard.kycApproved && !wizard.accountFrozen && wizard.walletActive;
       case 1: return wizard.rateLocked && !!wizard.fxQuote;
-      case 2: return !!(wizard.beneficiary.name && wizard.beneficiary.bankName && wizard.beneficiary.accountNumber && wizard.beneficiary.country && wizard.beneficiary.currency && wizard.beneficiary.paymentMethod);
+      case 2: return !!(
+        wizard.beneficiary.name?.trim() &&
+        wizard.beneficiary.bankName?.trim() &&
+        wizard.beneficiary.accountNumber?.trim() &&
+        wizard.beneficiary.country?.trim() &&
+        wizard.selectedCurrency &&
+        wizard.beneficiary.paymentMethod
+      );
       case 3: return wizard.narration.trim().length > 0;
       case 4: return wizard.consentVerified;
       case 5: return !!wizard.virtualAccount;
