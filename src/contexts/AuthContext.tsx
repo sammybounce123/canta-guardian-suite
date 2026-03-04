@@ -80,7 +80,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
   },
   sales: {
     dashboard: ["view"],
-    transactions: ["view"],
+    transactions: ["view", "act_on_behalf"],
     customers: ["view", "create"],
     rates: ["view"],
     virtual_accounts: ["view", "create"],
