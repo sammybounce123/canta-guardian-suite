@@ -23,6 +23,8 @@ import FinancialMetrics from "./pages/FinancialMetrics";
 import Reports from "./pages/Reports";
 import Expenses from "./pages/Expenses";
 import TransactOnBehalf from "./pages/TransactOnBehalf";
+import MerchantPortfolio from "./pages/MerchantPortfolio";
+import MerchantProfile from "./pages/MerchantProfile";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +52,8 @@ const App = () => (
             <Route path="/financial-metrics" element={<AppLayout><FinancialMetrics /></AppLayout>} />
             <Route path="/expenses" element={<AppLayout><Expenses /></AppLayout>} />
             <Route path="/reports" element={<AppLayout><Reports /></AppLayout>} />
+            <Route path="/merchants" element={<AppLayout><MerchantPortfolio /></AppLayout>} />
+            <Route path="/merchants/:id" element={<AppLayout><MerchantProfile /></AppLayout>} />
             <Route path="/transact-on-behalf" element={<AppLayout><TransactOnBehalf /></AppLayout>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -53,11 +53,18 @@ export default function Dashboard() {
           {role === "finance" && "Financial reporting and metrics"}
           </p>
         </div>
-        {(role === "sales" || role === "admin" || role === "super_admin") && (
-          <Button onClick={() => navigate("/onboarding/new")} className="gap-2">
-            <UserPlus className="h-4 w-4" /> Onboard Customer
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {(role === "sales" || role === "admin" || role === "super_admin") && (
+            <Button variant="outline" onClick={() => navigate("/merchants")} className="gap-2">
+              <Building2 className="h-4 w-4" /> My Merchants
+            </Button>
+          )}
+          {(role === "sales" || role === "admin" || role === "super_admin") && (
+            <Button onClick={() => navigate("/onboarding/new")} className="gap-2">
+              <UserPlus className="h-4 w-4" /> Onboard Customer
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${Math.min(visibleStats.length, 4)} gap-4`}>
