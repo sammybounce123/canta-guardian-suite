@@ -212,11 +212,43 @@ export default function TransactOnBehalf() {
   }
 
   if (!customer) {
+    const approvedCustomers = mockOnboardingDrafts.filter((d) => d.status === "approved");
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <AlertTriangle className="h-10 w-10 text-warning mb-3" />
-        <h2 className="text-lg font-medium">Customer not found</h2>
-        <Button variant="outline" className="mt-4" onClick={() => navigate("/onboarding")}>Back to Onboarding</Button>
+      <div className="space-y-6 max-w-3xl mx-auto">
+        <div>
+          <h1 className="text-xl font-semibold">Transaction on Behalf of Customer</h1>
+          <p className="text-sm text-muted-foreground">Select an approved customer to initiate a transaction</p>
+        </div>
+        {approvedCustomers.length === 0 ? (
+          <Card>
+            <CardContent className="py-10 text-center text-muted-foreground">
+              No approved customers available.
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-3">
+            {approvedCustomers.map((c) => (
+              <Card
+                key={c.id}
+                className="cursor-pointer hover:border-primary/50 transition-colors"
+                onClick={() => navigate(`/transact-on-behalf?customerId=${c.id}`)}
+              >
+                <CardContent className="py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
+                      <User className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">{c.fullName}</p>
+                      <p className="text-xs text-muted-foreground">{c.email} · {c.id}</p>
+                    </div>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
