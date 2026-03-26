@@ -305,6 +305,39 @@ export default function TransactOnBehalf() {
         </div>
       </div>
 
+      {/* Real-time Timeline */}
+      <Card className="bg-card border-border">
+        <CardContent className="py-4">
+          <div className="flex items-center gap-1 overflow-x-auto pb-1">
+            {STEPS.map((stepLabel, i) => {
+              const isCompleted = i < wizard.step;
+              const isCurrent = i === wizard.step;
+              return (
+                <div key={i} className="flex items-center min-w-0">
+                  <div className="flex flex-col items-center gap-1">
+                    <div className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                      isCompleted ? "bg-success text-success-foreground" :
+                      isCurrent ? "bg-primary text-primary-foreground" :
+                      "bg-muted text-muted-foreground"
+                    }`}>
+                      {isCompleted ? <CheckCircle2 className="h-3.5 w-3.5" /> : i + 1}
+                    </div>
+                    <span className={`text-[9px] text-center leading-tight max-w-[60px] ${
+                      isCurrent ? "text-primary font-medium" : "text-muted-foreground"
+                    }`}>
+                      {stepLabel}
+                    </span>
+                  </div>
+                  {i < STEPS.length - 1 && (
+                    <div className={`h-0.5 w-4 mx-0.5 mt-[-12px] ${isCompleted ? "bg-success" : "bg-muted"}`} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Compliance flags */}
       {complianceFlags.length > 0 && (
         <Card className="border-warning/30 bg-warning/5">
