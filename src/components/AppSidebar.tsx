@@ -46,7 +46,8 @@ const navItems: { title: string; url: string; icon: React.ElementType; resource:
   { title: "Financial Metrics", url: "/financial-metrics", icon: BarChart3, resource: "financial_metrics" },
   { title: "Expenses", url: "/expenses", icon: Receipt, resource: "expenses" },
   { title: "Reports", url: "/reports", icon: FileBarChart, resource: "reporting" },
-  { title: "Transact on Behalf", url: "/transact-on-behalf", icon: ArrowLeftRight, resource: "transactions" },
+  { title: "My Merchants", url: "/merchants", icon: Building2, resource: "transactions" },
+  { title: "Assist Transaction", url: "/transact-on-behalf", icon: ArrowLeftRight, resource: "transactions" },
   { title: "Settings", url: "/settings", icon: Settings, resource: "settings" },
 ];
 
