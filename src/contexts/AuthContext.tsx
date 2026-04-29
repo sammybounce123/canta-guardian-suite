@@ -1,4 +1,51 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+
+const SESSION_STORAGE_KEY = "canta_ops_session";
+const REMEMBER_ME_DAYS = 7;
+
+interface PersistedSession {
+  user: InternalUser;
+  expiresAt: number | null; // null = session-only (cleared on tab close)
+}
+
+function loadSession(): InternalUser | null {
+  try {
+    // Prefer persistent (remember-me) storage, fall back to session storage
+    const raw =
+      localStorage.getItem(SESSION_STORAGE_KEY) ??
+      sessionStorage.getItem(SESSION_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed: PersistedSession = JSON.parse(raw);
+    if (parsed.expiresAt && Date.now() > parsed.expiresAt) {
+      localStorage.removeItem(SESSION_STORAGE_KEY);
+      sessionStorage.removeItem(SESSION_STORAGE_KEY);
+      return null;
+    }
+    return parsed.user;
+  } catch {
+    return null;
+  }
+}
+
+function saveSession(user: InternalUser, remember: boolean) {
+  const payload: PersistedSession = {
+    user,
+    expiresAt: remember ? Date.now() + REMEMBER_ME_DAYS * 24 * 60 * 60 * 1000 : null,
+  };
+  const serialized = JSON.stringify(payload);
+  if (remember) {
+    localStorage.setItem(SESSION_STORAGE_KEY, serialized);
+    sessionStorage.removeItem(SESSION_STORAGE_KEY);
+  } else {
+    sessionStorage.setItem(SESSION_STORAGE_KEY, serialized);
+    localStorage.removeItem(SESSION_STORAGE_KEY);
+  }
+}
+
+function clearSession() {
+  localStorage.removeItem(SESSION_STORAGE_KEY);
+  sessionStorage.removeItem(SESSION_STORAGE_KEY);
+}
 
 export type UserRole = "super_admin" | "admin" | "sales" | "compliance" | "treasury" | "support" | "finance";
 
@@ -167,7 +214,7 @@ const permissionMatrix: Record<UserRole, Partial<Record<Resource, Action[]>>> = 
 
 interface AuthContextType {
   user: InternalUser | null;
-  login: (email: string, password: string) => boolean;
+  login: (email: string, password: string, remember?: boolean) => boolean;
   logout: () => void;
   hasPermission: (resource: Resource, action: Action) => boolean;
   canAccessRoute: (resource: Resource) => boolean;
@@ -196,14 +243,32 @@ const roleProfiles: Record<UserRole, { name: string; id: string }> = {
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<InternalUser | null>(mockUser);
+  const [user, setUser] = useState<InternalUser | null>(() => loadSession() ?? mockUser);
+  const [remember, setRemember] = useState<boolean>(() => {
+    return localStorage.getItem(SESSION_STORAGE_KEY) !== null;
+  });
 
-  const login = (email: string, _password: string) => {
-    setUser({ ...mockUser, email });
+  // Re-persist whenever the user changes (e.g. role switch) using current remember preference
+  useEffect(() => {
+    if (user) {
+      saveSession(user, remember);
+    } else {
+      clearSession();
+    }
+  }, [user, remember]);
+
+  const login = (email: string, _password: string, rememberMe = false) => {
+    const next = { ...mockUser, email, lastLogin: new Date().toISOString() };
+    setRemember(rememberMe);
+    setUser(next);
+    saveSession(next, rememberMe);
     return true;
   };
 
-  const logout = () => setUser(null);
+  const logout = () => {
+    clearSession();
+    setUser(null);
+  };
 
   const switchRole = (role: UserRole) => {
     const profile = roleProfiles[role];
