@@ -20,7 +20,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      if (login(email, password)) {
+      if (login(email, password, remember)) {
         navigate("/");
       }
       setLoading(false);
