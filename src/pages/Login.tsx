@@ -136,6 +136,10 @@ export default function Login() {
                 </Label>
                 <button
                   type="button"
+                  onClick={() => {
+                    setForgotEmail(email);
+                    setForgotOpen(true);
+                  }}
                   className="text-xs text-primary hover:underline font-medium"
                 >
                   Forgot?
