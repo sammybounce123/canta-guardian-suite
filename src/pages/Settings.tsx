@@ -6,8 +6,8 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/contexts/AuthContext";
-import { Plus, Shield, Users, Key, Lock, Ban, CheckCircle } from "lucide-react";
+import { useAuth, type UserRole } from "@/contexts/AuthContext";
+import { Plus, Shield, Users, Key, Lock, Ban, CheckCircle, Pencil } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +18,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
+
+const ROLES: UserRole[] = ["super_admin", "admin", "sales", "compliance", "treasury", "support", "finance"];
 
 interface InternalUserRow {
   id: string;
