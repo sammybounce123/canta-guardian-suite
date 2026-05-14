@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Lock, Mail, Eye, EyeOff, ShieldCheck, Activity, Globe2 } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff, ShieldCheck, Activity, Globe2, ArrowLeft } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,8 +15,25 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const handleForgotSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail) return;
+    setForgotLoading(true);
+    setTimeout(() => {
+      setForgotLoading(false);
+      setForgotOpen(false);
+      toast.success("Reset link sent", {
+        description: `Check ${forgotEmail} for password reset instructions.`,
+      });
+      setForgotEmail("");
+    }, 800);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,6 +136,10 @@ export default function Login() {
                 </Label>
                 <button
                   type="button"
+                  onClick={() => {
+                    setForgotEmail(email);
+                    setForgotOpen(true);
+                  }}
                   className="text-xs text-primary hover:underline font-medium"
                 >
                   Forgot?
@@ -182,6 +205,45 @@ export default function Login() {
           </form>
         </div>
       </div>
+
+      {/* Forgot password dialog */}
+      <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reset password</DialogTitle>
+            <DialogDescription>
+              Enter your work email and we will send you a secure reset link.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleForgotSubmit} className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="forgot-email" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                Work email
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="forgot-email"
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  placeholder="you@cantaops.com"
+                  className="pl-9 h-11 bg-card border-border focus-visible:ring-primary/40"
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={() => setForgotOpen(false)}>
+                Back to sign in
+              </Button>
+              <Button type="submit" disabled={forgotLoading} className="font-medium">
+                {forgotLoading ? "Sending…" : "Send reset link"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
