@@ -15,8 +15,25 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const handleForgotSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail) return;
+    setForgotLoading(true);
+    setTimeout(() => {
+      setForgotLoading(false);
+      setForgotOpen(false);
+      toast.success("Reset link sent", {
+        description: `Check ${forgotEmail} for password reset instructions.`,
+      });
+      setForgotEmail("");
+    }, 800);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
