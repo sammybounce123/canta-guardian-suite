@@ -175,7 +175,7 @@ export default function Settings() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-base">Internal Users</CardTitle>
                 {canManageUsers && (
-                  <Button size="sm" className="gap-2"><Plus className="h-4 w-4" /> Add User</Button>
+                  <Button size="sm" className="gap-2" onClick={openAddUser}><Plus className="h-4 w-4" /> Add User</Button>
                 )}
               </CardHeader>
               <CardContent>
