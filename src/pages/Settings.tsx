@@ -6,8 +6,8 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/contexts/AuthContext";
-import { Plus, Shield, Users, Key, Lock, Ban, CheckCircle } from "lucide-react";
+import { useAuth, type UserRole } from "@/contexts/AuthContext";
+import { Plus, Shield, Users, Key, Lock, Ban, CheckCircle, Pencil } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +18,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
+
+const ROLES: UserRole[] = ["super_admin", "admin", "sales", "compliance", "treasury", "support", "finance"];
 
 interface InternalUserRow {
   id: string;
@@ -59,6 +76,54 @@ export default function Settings() {
 
   const [internalUsers, setInternalUsers] = useState<InternalUserRow[]>(initialUsers);
   const [suspendTarget, setSuspendTarget] = useState<InternalUserRow | null>(null);
+  const [userDialogOpen, setUserDialogOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<InternalUserRow | null>(null);
+  const [form, setForm] = useState<{ name: string; email: string; role: UserRole }>({
+    name: "",
+    email: "",
+    role: "sales",
+  });
+
+  const canEditUsers = hasPermission("internal_users", "update");
+
+  const openAddUser = () => {
+    setEditingUser(null);
+    setForm({ name: "", email: "", role: "sales" });
+    setUserDialogOpen(true);
+  };
+
+  const openEditUser = (u: InternalUserRow) => {
+    setEditingUser(u);
+    setForm({ name: u.name, email: u.email, role: u.role as UserRole });
+    setUserDialogOpen(true);
+  };
+
+  const handleSaveUser = () => {
+    if (!form.name.trim() || !form.email.trim()) {
+      toast.error("Name and email are required.");
+      return;
+    }
+    if (editingUser) {
+      setInternalUsers((prev) =>
+        prev.map((u) =>
+          u.id === editingUser.id ? { ...u, name: form.name, email: form.email, role: form.role } : u
+        )
+      );
+      toast.success(`${form.name} updated. Role set to ${form.role.replace("_", " ")}.`);
+    } else {
+      const newUser: InternalUserRow = {
+        id: `usr_${Math.random().toString(36).slice(2, 8)}`,
+        name: form.name,
+        email: form.email,
+        role: form.role,
+        status: "active",
+        lastLogin: "—",
+      };
+      setInternalUsers((prev) => [...prev, newUser]);
+      toast.success(`${form.name} added as ${form.role.replace("_", " ")}.`);
+    }
+    setUserDialogOpen(false);
+  };
 
   const handleToggleSuspend = () => {
     if (!suspendTarget) return;
@@ -110,7 +175,7 @@ export default function Settings() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-base">Internal Users</CardTitle>
                 {canManageUsers && (
-                  <Button size="sm" className="gap-2"><Plus className="h-4 w-4" /> Add User</Button>
+                  <Button size="sm" className="gap-2" onClick={openAddUser}><Plus className="h-4 w-4" /> Add User</Button>
                 )}
               </CardHeader>
               <CardContent>
@@ -150,22 +215,34 @@ export default function Settings() {
                           <td className="py-3 px-2 text-sm text-muted-foreground text-right font-mono">{u.lastLogin}</td>
                           {canDeleteUsers && (
                             <td className="py-3 px-2 text-center">
-                              {u.role !== "super_admin" ? (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className={`text-xs gap-1.5 ${u.status === "active" ? "text-destructive hover:text-destructive" : "text-success hover:text-success"}`}
-                                  onClick={() => setSuspendTarget(u)}
-                                >
-                                  {u.status === "active" ? (
-                                    <><Ban className="h-3.5 w-3.5" /> Suspend</>
-                                  ) : (
-                                    <><CheckCircle className="h-3.5 w-3.5" /> Reactivate</>
-                                  )}
-                                </Button>
-                              ) : (
-                                <span className="text-xs text-muted-foreground">—</span>
-                              )}
+                              <div className="flex items-center justify-center gap-1">
+                                {canEditUsers && u.role !== "super_admin" && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-xs gap-1.5"
+                                    onClick={() => openEditUser(u)}
+                                  >
+                                    <Pencil className="h-3.5 w-3.5" /> Edit
+                                  </Button>
+                                )}
+                                {u.role !== "super_admin" ? (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`text-xs gap-1.5 ${u.status === "active" ? "text-destructive hover:text-destructive" : "text-success hover:text-success"}`}
+                                    onClick={() => setSuspendTarget(u)}
+                                  >
+                                    {u.status === "active" ? (
+                                      <><Ban className="h-3.5 w-3.5" /> Suspend</>
+                                    ) : (
+                                      <><CheckCircle className="h-3.5 w-3.5" /> Reactivate</>
+                                    )}
+                                  </Button>
+                                ) : (
+                                  <span className="text-xs text-muted-foreground">—</span>
+                                )}
+                              </div>
                             </td>
                           )}
                         </tr>
@@ -257,6 +334,66 @@ export default function Settings() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Add / Edit user dialog */}
+      <Dialog open={userDialogOpen} onOpenChange={setUserDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingUser ? "Edit User" : "Add Internal User"}</DialogTitle>
+            <DialogDescription>
+              {editingUser
+                ? "Update this user's details and assigned role."
+                : "Create a new internal user and assign them a role."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="user-name">Full name</Label>
+              <Input
+                id="user-name"
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                placeholder="Jane Doe"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="user-email">Email</Label>
+              <Input
+                id="user-email"
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                placeholder="jane@cantaops.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="user-role">Role</Label>
+              <Select
+                value={form.role}
+                onValueChange={(v) => setForm((f) => ({ ...f, role: v as UserRole }))}
+              >
+                <SelectTrigger id="user-role">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ROLES.map((r) => (
+                    <SelectItem key={r} value={r} className="capitalize">
+                      {r.replace("_", " ")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Permissions are determined by the assigned role.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUserDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveUser}>{editingUser ? "Save changes" : "Create user"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
