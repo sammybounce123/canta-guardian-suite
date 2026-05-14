@@ -204,7 +204,44 @@ export default function Login() {
             </p>
           </form>
         </div>
-      </div>
+      {/* Forgot password dialog */}
+      <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reset password</DialogTitle>
+            <DialogDescription>
+              Enter your work email and we will send you a secure reset link.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleForgotSubmit} className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="forgot-email" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                Work email
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="forgot-email"
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  placeholder="you@cantaops.com"
+                  className="pl-9 h-11 bg-card border-border focus-visible:ring-primary/40"
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={() => setForgotOpen(false)}>
+                Back to sign in
+              </Button>
+              <Button type="submit" disabled={forgotLoading} className="font-medium">
+                {forgotLoading ? "Sending…" : "Send reset link"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
