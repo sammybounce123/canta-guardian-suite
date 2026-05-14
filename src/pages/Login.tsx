@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Lock, Mail, Eye, EyeOff, ShieldCheck, Activity, Globe2 } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff, ShieldCheck, Activity, Globe2, ArrowLeft } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 export default function Login() {
   const [email, setEmail] = useState("");
