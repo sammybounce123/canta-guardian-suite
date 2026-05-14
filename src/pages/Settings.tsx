@@ -76,6 +76,54 @@ export default function Settings() {
 
   const [internalUsers, setInternalUsers] = useState<InternalUserRow[]>(initialUsers);
   const [suspendTarget, setSuspendTarget] = useState<InternalUserRow | null>(null);
+  const [userDialogOpen, setUserDialogOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<InternalUserRow | null>(null);
+  const [form, setForm] = useState<{ name: string; email: string; role: UserRole }>({
+    name: "",
+    email: "",
+    role: "sales",
+  });
+
+  const canEditUsers = hasPermission("internal_users", "update");
+
+  const openAddUser = () => {
+    setEditingUser(null);
+    setForm({ name: "", email: "", role: "sales" });
+    setUserDialogOpen(true);
+  };
+
+  const openEditUser = (u: InternalUserRow) => {
+    setEditingUser(u);
+    setForm({ name: u.name, email: u.email, role: u.role as UserRole });
+    setUserDialogOpen(true);
+  };
+
+  const handleSaveUser = () => {
+    if (!form.name.trim() || !form.email.trim()) {
+      toast.error("Name and email are required.");
+      return;
+    }
+    if (editingUser) {
+      setInternalUsers((prev) =>
+        prev.map((u) =>
+          u.id === editingUser.id ? { ...u, name: form.name, email: form.email, role: form.role } : u
+        )
+      );
+      toast.success(`${form.name} updated. Role set to ${form.role.replace("_", " ")}.`);
+    } else {
+      const newUser: InternalUserRow = {
+        id: `usr_${Math.random().toString(36).slice(2, 8)}`,
+        name: form.name,
+        email: form.email,
+        role: form.role,
+        status: "active",
+        lastLogin: "—",
+      };
+      setInternalUsers((prev) => [...prev, newUser]);
+      toast.success(`${form.name} added as ${form.role.replace("_", " ")}.`);
+    }
+    setUserDialogOpen(false);
+  };
 
   const handleToggleSuspend = () => {
     if (!suspendTarget) return;
