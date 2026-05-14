@@ -215,22 +215,34 @@ export default function Settings() {
                           <td className="py-3 px-2 text-sm text-muted-foreground text-right font-mono">{u.lastLogin}</td>
                           {canDeleteUsers && (
                             <td className="py-3 px-2 text-center">
-                              {u.role !== "super_admin" ? (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className={`text-xs gap-1.5 ${u.status === "active" ? "text-destructive hover:text-destructive" : "text-success hover:text-success"}`}
-                                  onClick={() => setSuspendTarget(u)}
-                                >
-                                  {u.status === "active" ? (
-                                    <><Ban className="h-3.5 w-3.5" /> Suspend</>
-                                  ) : (
-                                    <><CheckCircle className="h-3.5 w-3.5" /> Reactivate</>
-                                  )}
-                                </Button>
-                              ) : (
-                                <span className="text-xs text-muted-foreground">—</span>
-                              )}
+                              <div className="flex items-center justify-center gap-1">
+                                {canEditUsers && u.role !== "super_admin" && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-xs gap-1.5"
+                                    onClick={() => openEditUser(u)}
+                                  >
+                                    <Pencil className="h-3.5 w-3.5" /> Edit
+                                  </Button>
+                                )}
+                                {u.role !== "super_admin" ? (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`text-xs gap-1.5 ${u.status === "active" ? "text-destructive hover:text-destructive" : "text-success hover:text-success"}`}
+                                    onClick={() => setSuspendTarget(u)}
+                                  >
+                                    {u.status === "active" ? (
+                                      <><Ban className="h-3.5 w-3.5" /> Suspend</>
+                                    ) : (
+                                      <><CheckCircle className="h-3.5 w-3.5" /> Reactivate</>
+                                    )}
+                                  </Button>
+                                ) : (
+                                  <span className="text-xs text-muted-foreground">—</span>
+                                )}
+                              </div>
                             </td>
                           )}
                         </tr>
