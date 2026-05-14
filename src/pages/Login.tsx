@@ -204,6 +204,8 @@ export default function Login() {
             </p>
           </form>
         </div>
+      </div>
+
       {/* Forgot password dialog */}
       <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
         <DialogContent className="sm:max-w-md">
